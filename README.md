@@ -74,40 +74,42 @@ any: function (arr) {
 }
 ```
 
-Y para ello doy una razón de lógica matemática, que para mi con esta hubiera bastado. Tenemos que:
+## Explicación lógica matemática:
+
 
 ```
 Existe x que cumple P(x)
 ```
-Que, como podemos ver, tiene relación con la función `any`:
+equivale en lógica matemática a: 
 ```
-Existe una promesa que resuelve exitosamente
-```
-
-Luego tenemos la expresión:
-```
-Para todo x se cumple P(x)
-```
-Que, como podemos ver, tiene relación con la función `all`:
-```
-Para toda promesa se resuelve exitosamente.
+No para todo x no se cumple P(x)
 ```
 
-Pero es que en lógica matemática:
-`Existe x que cumple P(x)` equivale a `No (para todo x no (se cumple P(x)))`
+De hecho, puede implementarse el método `Array.prototype.some` con ayuda del método `Array.prototype.every` usando esta regla:
+```
+var every = Array.prototype.every
 
-O lo que es lo mismo, `Existe una promesa que se resuelve con éxito` equivale a decir `No para toda promesa no se resuelve con éxito`
+Array.prototype.some = function (e) {
+	return not(every.call(this.map(not)))
+}
 
-Donde aquí el `no resolverse con éxito` significa que se `resuelve fallidamente`. Y aquí es donde interviene la función inversa de la promesa. La función inversa es aquella que dada una promesa resuelta exitosamente, devuelve una que resuelve fallidamente y, a la inversa, dada una promesa resuelta fallidamente, devuelve una que resuelve exitosamente. 
-Esto es lo que hace la función `inverse` implementada en `index.js`. 
+// donde not es
+function (e) {
+	return !e
+}
+```
 
-Con lo cual, implementar `any` es casi una mera sustitución de palabras por métodos:
+Ahora bien, mientras la función inversa para los booleanos es la negación. Para una promesa, la función inversa es aquella que dada una promesa resuelta exitosamente, devuelve una que resuelve fallidamente y, a la inversa, dada una promesa resuelta fallidamente, devuelve una que resuelve exitosamente. 
+
+Con lo cual, simplemente sustituyendo los métodos encontramos la implementación de any.
 
 ``` javascript
 any: function (arr) {
     return this.inverse(this.all(arr.map(this.inverse)));
 }
 ```
+
+que se puede ver en el fichero `index.js`
 
 
 
